@@ -1,7 +1,8 @@
-const {handlerWithXRayContext} = require("@architect/shared/tracing");
+const {handlerWithXRayContext, AWSXRay} = require("@architect/shared/tracing");
 const {initialize} = require('@architect/shared/logger');
 const {getClient} = require('@architect/shared/storyblock');
 const arc = require('@architect/functions');
+const {v4: uuidv4} = require('uuid');
 const jsonata = require("jsonata");
 
 const OPERATION = "WEBHOOK_GAMES";
@@ -10,10 +11,11 @@ const ctx = {
     operation: OPERATION,
     type: TYPE,
 }
-const logger = initialize(ctx);
+let logger;
 const storyblock = getClient();
 
 async function getStoryblockGame(id) {
+
     const mapping_expression = jsonata(`{
     "id": $.data.story.slug,
     "name": $.data.story.name,
@@ -27,26 +29,58 @@ async function getStoryblockGame(id) {
     "modified": $.data.story.published_at
     }`);
 
+    const subsegment = AWSXRay.getSegment().addNewSubsegment('##StoryBlock.GetStory');
+    subsegment.addMetadata('storyId', id);
+
+    logger.info({storyId: id}, `Fetching data for storyId: ${id}`);
+
     return storyblock.getStory(id).then(data => {
+        subsegment.addMetadata('storyblock-content', data);
+
         return mapping_expression.evaluate(data);
     }).catch(error => {
-        logger.error({error: {...error, stack: error.stack}}, `There was an error attempting to talk to storyblock ${error.message}`)
+        subsegment.addError(error);
+
+        logger.error({
+            error: {...error, stack: error.stack},
+            storyId: id
+        }, `There was an error attempting to talk to storyblock ${error.message}`)
+    }).finally(() => {
+        subsegment.close();
     })
+}
+
+async function updateGame(game) {
+    const subsegment = AWSXRay.getSegment().addNewSubsegment('##DDB.UpdateGame');
+    subsegment.addAnnotation('gameId', game.id);
+
+    try {
+        const data = await arc.tables();
+        const json = await data.games.put(game);
+
+        logger.info({gameId: game.id, game}, `Updated game ${game.id}`);
+        subsegment.addMetadata('game', json);
+
+        return json;
+    } catch (error) {
+        subsegment.addError(error);
+        logger.error({gameId: game.id, ...error}, `Error when storing game ${game.id}`);
+    } finally {
+        subsegment.close();
+    }
 }
 
 async function route(req, context) {
     const {body} = req;
-    const {action = '', story_id} = body;
+    const {action = '', story_id} = body || {};
+    const subsegment = AWSXRay.getSegment();
 
     if (action === 'published') {
-        logger.info({action: action.toUpperCase(), story_id});
+        logger.info({action: action.toUpperCase(), storyBookId: story_id}, "New content was published");
 
         try {
             const game = await getStoryblockGame(story_id);
-            logger.info({game: game.id,})
-
-            const data = await arc.tables();
-            const json = await data.games.put(game);
+            await updateGame(game);
 
             return {
                 status: 200,
@@ -55,7 +89,9 @@ async function route(req, context) {
                 }
             }
         } catch (error) {
-            logger.error({...error}, `There was an error attempting to save this entry ${error.message}`);
+            subsegment.addError(error);
+
+            logger.error({storyBookId: story_id, ...error}, `There was an error attempting to update this entry ${error.message}`);
 
             return {
                 status: 502,
@@ -76,12 +112,18 @@ async function route(req, context) {
 
 
 async function handler(req, context) {
-    context.logger = logger;
+    context.callbackWaitsForEmptyEventLoop = false;
 
-    logger.info(req, "request")
-    logger.info(context, "context")
+    const awsRequestId = context.awsRequestId || uuidv4();
+    logger = initialize({
+        awsRequestId,
+        ...ctx,
+    });
 
-    return handlerWithXRayContext({logger, ...ctx }, async () => route(req, context));
+    logger.info(req, "request");
+    logger.info(context, "context");
+
+    return handlerWithXRayContext({logger, ...ctx, awsRequestId}, async () => route(req, context));
 }
 
 exports.handler = arc.http(handler)

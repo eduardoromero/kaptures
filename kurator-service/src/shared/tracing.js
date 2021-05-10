@@ -1,11 +1,12 @@
 const AWSXRay = require("aws-xray-sdk-core");
-const http = AWSXRay.captureHTTPs(require('http'));
-const https = AWSXRay.captureHTTPs(require('http'));
 const TraceID = require("aws-xray-sdk-core/lib/segments/attributes/trace_id");
 const {logger: Logger} = require("./logger");
 
-AWSXRay.captureHTTPsGlobal(http);
-AWSXRay.captureHTTPsGlobal(https);
+AWSXRay.enableAutomaticMode();
+AWSXRay.captureHTTPsGlobal(require('http'));
+AWSXRay.captureHTTPsGlobal(require('https'));
+AWSXRay.captureAWS(require('aws-sdk'));
+AWSXRay.capturePromise();
 
 function getTraceMetadata() {
     // _X_AMZN_TRACE_ID looks like 'Root=1-5ddf3ec9-03f86f7c6e879a40e30a2bd8;Parent=c27e2dbab5d56894;Sampled=1'
@@ -23,7 +24,7 @@ function getTraceMetadata() {
     return {root, parent};
 }
 
-const handlerWithXRayContext = async (ctx, handler) => {
+async function handlerWithXRayContext(ctx, handler) {
     const {operation, type, awsRequestId = ""} = ctx;
     const {root, parent} = getTraceMetadata();
     let segment, { logger } = ctx;
@@ -33,12 +34,20 @@ const handlerWithXRayContext = async (ctx, handler) => {
         logger.info({operation, type});
     }
 
+    AWSXRay.setLogger({
+        error: (message, meta) => logger.error(meta, message),
+        warn: (message, meta) => logger.warn(meta, message),
+        info: (message, meta) => logger.info(meta, message),
+        debug: (message, meta) => logger.debug(meta, message),
+    });
+
     if (!parent) {
         segment = new AWSXRay.Segment(operation, root);
-        AWSXRay.setSegment(segment);
     } else {
         segment = new AWSXRay.Segment(`${type}-${operation}`, AWSXRay.getSegment().trace_id, AWSXRay.getSegment().parent_id)
     }
+
+    AWSXRay.setSegment(segment);
 
     return AWSXRay.captureAsyncFunc(operation, async (subsegment) => {
         subsegment.addAnnotation('awsRequestId', awsRequestId);
@@ -57,11 +66,10 @@ const handlerWithXRayContext = async (ctx, handler) => {
     }, segment).finally(() => {
         segment.close();
         segment.flush();
-
-        logger.info(segment, "Root Segment");
     });
 }
 
 module.exports = {
-    handlerWithXRayContext
+    handlerWithXRayContext,
+    AWSXRay,
 }
