@@ -1,0 +1,24 @@
+{
+  "name": "kurator-service",
+  "version": "0.0.0",
+  "description": "Kurator Service",
+  "scripts": {
+    "start": "npx sandbox"
+  },
+  "devDependencies": {
+    "@architect/architect": "^8.5.4"
+  },
+  "dependencies": {
+    "@architect/data": "^3.0.5",
+    "@architect/functions": "^3.13.10",
+    "@prismicio/client": "^4.0.0",
+    "aws-xray-sdk-core": "^3.3.1",
+    "axios": "^0.21.1",
+    "honeycomb-beeline": "^2.6.0",
+    "jsonata": "^1.8.4",
+    "pino": "^6.11.3",
+    "pino-lambda": "^1.2.4",
+    "storyblok-js-client": "^3.3.1",
+    "uuid": "^3.3.2"
+  }
+}
