@@ -1,6 +1,6 @@
 # Kaptures
 
-Kaptures is a fictional startup, its value prop is socialize gaming, making it more 
+Kaptures is a fictional startup. Its value prop is socialize gaming, making it more 
 engaging for our users and their friends in social media. Kapture *launched* in 2020,
 mid-pandemic, a weird time when everyone is in their homes playing.
 
