@@ -1,4 +1,5 @@
 const AWSXRay = require("aws-xray-sdk-core");
+const LambdaEnv = require('aws-xray-sdk-core/lib/env/aws_lambda');
 const TraceID = require("aws-xray-sdk-core/lib/segments/attributes/trace_id");
 const {logger: Logger} = require("./logger");
 
@@ -27,7 +28,7 @@ function getTraceMetadata() {
 async function handlerWithXRayContext(ctx, handler) {
     const {operation, type, awsRequestId = ""} = ctx;
     const {root, parent} = getTraceMetadata();
-    let segment, { logger } = ctx;
+    let segment, {logger} = ctx;
 
     if (!ctx.logger) {
         logger = Logger;
@@ -44,6 +45,9 @@ async function handlerWithXRayContext(ctx, handler) {
     if (!parent) {
         segment = new AWSXRay.Segment(operation, root);
     } else {
+        // Update environment to the current AWS Lambda function running.
+        // see https://github.com/aws/aws-xray-sdk-node/blob/master/packages/core/lib/env/aws_lambda.js
+        LambdaEnv.init();
         segment = new AWSXRay.Segment(`${type}-${operation}`, AWSXRay.getSegment().trace_id, AWSXRay.getSegment().parent_id)
     }
 

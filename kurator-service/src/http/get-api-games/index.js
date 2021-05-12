@@ -63,7 +63,7 @@ async function getGames(req) {
 }
 
 async function handler(req, context) {
-    context.callbackWaitsForEmptyEventLoop = false;
+    context.callbackWaitsForEmptyEventLoop = true;
     const awsRequestId = context.awsRequestId || uuidv4();
     logger = initialize({
         awsRequestId,
