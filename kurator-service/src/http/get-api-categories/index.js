@@ -1,10 +1,10 @@
 const {handlerWithXRayContext, AWSXRay} = require("@architect/shared/tracing");
 const {initialize} = require('@architect/shared/logger');
 const arc = require('@architect/functions');
-const {v4: uuidv4} = require('uuid');
+const { v4: uuidv4 } = require('uuid');
 const jsonata = require("jsonata");
 
-const OPERATION = "GET_GAMES";
+const OPERATION = "GET_CATEGORIES";
 const TYPE = 'HTTP';
 const ctx = {
     operation: OPERATION,
@@ -15,7 +15,7 @@ let logger;
 
 function mapper(data) {
     const mapping_expression = jsonata(`{
-        'games': $.Items,
+        'categories': $.Items,
         'meta': {
             'total': $.Count
         }
@@ -24,28 +24,37 @@ function mapper(data) {
     return mapping_expression.evaluate(data);
 }
 
-async function getDDBGames() {
-    const subsegment = AWSXRay.getSegment().addNewSubsegment('##DDB.GetGames');
-    logger.info("fetching games");
+async function getDDBCategories() {
+    const subsegment = AWSXRay.getSegment().addNewSubsegment('##DDB.GetCategories');
+    logger.info("fetching categories");
 
     try {
         const data = await arc.tables();
-        return await data.games.scan({});
-    } catch (error) {
+        return await data.categories.query({
+            KeyConditionExpression: '#PK = :PK and begins_with(categoryGameTs, :SK)',
+            ExpressionAttributeNames:{
+                "#PK": "PK"
+            },
+            ExpressionAttributeValues: {
+                ":PK": 'category',
+                ":SK": "##CATEGORY",
+            }
+        });
+    } catch(error) {
         subsegment.addError(error);
-        logger.error({...error}, `Error attempting to get games`);
+        logger.error({ ...error}, `Error attempting to get categories`);
     } finally {
         subsegment.close();
     }
 }
 
-async function getGames(req) {
+async function getCategories(req) {
     logger.info(req);
     try {
-        const json = await getDDBGames() || {Count: 0};
+        const json = await getDDBCategories() || {Count: 0};
 
         const total = json.Count;
-        logger.info({games: total}, `games found: ${total}`);
+        logger.info({ categories: total }, `categories found: ${total}`);
 
         return mapper(json);
     } catch (e) {
@@ -75,7 +84,7 @@ async function handler(req, context) {
     logger.info(req, "request")
     logger.info(context, "context")
 
-    return handlerWithXRayContext({logger, ...ctx, awsRequestId}, async () => getGames(req))
+    return handlerWithXRayContext({logger, ...ctx, awsRequestId}, async () => getCategories(req))
 }
 
 exports.handler = arc.http.async(handler)

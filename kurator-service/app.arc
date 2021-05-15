@@ -3,17 +3,30 @@ kurator-service
 
 @http
 get /
-
 get /api/games
+get /api/categories
 
 post /webhooks/games
+
+@events
+game-updates
 
 @tables
 games
   id *String
 
+categories
+  PK *String
+  categoryGameTs **String
+
 kaptures
   id *String
+
+@indexes
+categories
+  name gamesPerCategory
+  category *String
+  game **String
 
 @active-tracing
 
