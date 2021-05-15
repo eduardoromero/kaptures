@@ -9,7 +9,10 @@ const formatters = {
 const logger = pino({
     name: process.env.ARC_APP_NAME || "",
     formatters,
-
+    redact: {
+        paths: ['accessToken', '[*].accessToken'],
+        censor: "~~~REDACTED~~~"
+    }
 });
 
 function initialize(ctx = {}) {

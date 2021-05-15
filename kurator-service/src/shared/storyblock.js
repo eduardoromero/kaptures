@@ -1,5 +1,11 @@
+const AWSXRay = require("aws-xray-sdk-core");
+const http = AWSXRay.captureHTTPs(require('http'));
+const https = AWSXRay.captureHTTPs(require('http'));
 const StoryblokClient = require('storyblok-js-client');
 const { logger } = require('./logger');
+
+AWSXRay.captureHTTPsGlobal(http);
+AWSXRay.captureHTTPsGlobal(https);
 
 const {STORYBLOCK_API_TOKEN} = process.env;
 
