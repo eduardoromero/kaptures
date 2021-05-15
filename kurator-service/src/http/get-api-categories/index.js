@@ -15,7 +15,13 @@ let logger;
 
 function mapper(data) {
     const mapping_expression = jsonata(`{
-        'categories': $.Items,
+        'categories': $map($.Items, function($c){
+            {
+                "category": $c.category,
+                "created": $c.created,
+                "_type": $c._type
+            }
+        }),
         'meta': {
             'total': $.Count
         }
@@ -65,7 +71,7 @@ async function getCategories(req) {
             json: {
                 name: e.name,
                 message: e.message,
-                stack: e.stack
+                stackTrace: e.stack
             }
         }
     }

@@ -42,7 +42,7 @@ async function getStoryblockGame(id) {
         subsegment.addError(error);
 
         logger.error({
-            error: {...error, stack: error.stack},
+            error: {...error, stackTrace: error.stack},
             storyId: id
         }, `There was an error attempting to talk to storyblock ${error.message}`)
     }).finally(() => {
@@ -108,7 +108,7 @@ async function route(req, context) {
                 json: {
                     name: error.name,
                     message: error.message,
-                    stack: error.stack
+                    stackTrace: error.stack
                 }
             }
         }

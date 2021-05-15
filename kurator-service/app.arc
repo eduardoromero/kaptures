@@ -4,7 +4,9 @@ kurator-service
 @http
 get /
 get /api/games
+get /api/games/:game
 get /api/categories
+get /api/categories/:category
 
 post /webhooks/games
 

@@ -46,7 +46,7 @@ async function createCategory(categoryName) {
         logger.info({category}, `Category: ${categoryName}`);
         // going via the low-level DynamoDB DocumentClient because of composite key
         const params = {Key: key, Item: category, TableName: data._name("categories")};
-        logger.info({params}, "Update Category Query");
+        logger.debug({params}, "Update Category Query");
         await data._doc.put(params).promise();
 
         logger.info({category}, `Created ${categoryName} category successfully`);
@@ -81,7 +81,7 @@ async function createCategoryGame(categoryName, game) {
 
     // going via the low-level DynamoDB DocumentClient because of composite key
     const params = {Key: categoryGameKey, Item: entry, TableName: data._name("categories")};
-    logger.info({params}, "Update CategoryGame Query");
+    logger.debug({params}, "Update CategoryGame Query");
 
     return data._doc.put(params).promise();
 }
@@ -141,8 +141,6 @@ const handler = arc.events.subscribe(gameUpdatedHandler);
 exports.handler = async (event, context) => {
     context.callbackWaitsForEmptyEventLoop = true;
     awsRequestId = context.awsRequestId || uuidv4();
-
-    console.dir(event, {depth: 10});
 
     // no need to do this for every single call, tables won't change unless re-deploy happens.
     if (!data) {

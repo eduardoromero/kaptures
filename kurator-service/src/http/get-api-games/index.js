@@ -56,7 +56,7 @@ async function getGames(req) {
             json: {
                 name: e.name,
                 message: e.message,
-                stack: e.stack
+                stackTrace: e.stack
             }
         }
     }
