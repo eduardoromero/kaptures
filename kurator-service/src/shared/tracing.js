@@ -3,12 +3,6 @@ const LambdaEnv = require('aws-xray-sdk-core/lib/env/aws_lambda');
 const TraceID = require("aws-xray-sdk-core/lib/segments/attributes/trace_id");
 const {logger: Logger} = require("./logger");
 
-AWSXRay.enableAutomaticMode();
-AWSXRay.captureHTTPsGlobal(require('http'));
-AWSXRay.captureHTTPsGlobal(require('https'));
-AWSXRay.captureAWS(require('aws-sdk'));
-AWSXRay.capturePromise();
-
 function getTraceMetadata() {
     // _X_AMZN_TRACE_ID looks like 'Root=1-5ddf3ec9-03f86f7c6e879a40e30a2bd8;Parent=c27e2dbab5d56894;Sampled=1'
     const {_X_AMZN_TRACE_ID = ''} = process.env;
@@ -43,8 +37,18 @@ async function handlerWithXRayContext(ctx, handler) {
     });
 
     if (!parent) {
+        // running on sandbox, switch to fake tracing
+        logger.info("Not running on Lambda Environment");
         segment = new AWSXRay.Segment(operation, root);
     } else {
+        logger.info("Running on Lambda Environment");
+        // enable all sorts of tracing magic!
+        AWSXRay.enableAutomaticMode();
+        AWSXRay.captureHTTPsGlobal(require('http'));
+        AWSXRay.captureHTTPsGlobal(require('https'));
+        AWSXRay.captureAWS(require('aws-sdk'));
+        AWSXRay.capturePromise();
+
         // Update environment to the current AWS Lambda function running.
         // see https://github.com/aws/aws-xray-sdk-node/blob/master/packages/core/lib/env/aws_lambda.js
         LambdaEnv.init();

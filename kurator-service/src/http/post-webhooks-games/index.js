@@ -42,7 +42,7 @@ async function getStoryblockGame(id) {
         subsegment.addError(error);
 
         logger.error({
-            error: {...error, stack: error.stack},
+            error: {...error, stackTrace: error.stack},
             storyId: id
         }, `There was an error attempting to talk to storyblock ${error.message}`)
     }).finally(() => {
@@ -56,7 +56,7 @@ async function updateGame(game) {
 
     try {
         const data = await arc.tables();
-        const json = await data.games.put(game);
+        const json = await data.games.  put(game);
 
         logger.info({gameId: game.id, game}, `Updated game ${game.id}`);
         subsegment.addMetadata('game', json);
@@ -82,6 +82,16 @@ async function route(req, context) {
             const game = await getStoryblockGame(story_id);
             await updateGame(game);
 
+            // send update
+            await arc.events.publish({
+                name: 'game-updates',
+                payload: {
+                    game,
+                    event: 'game-updated',
+                    timestamp: new Date()
+                },
+            })
+
             return {
                 status: 200,
                 json: {
@@ -98,7 +108,7 @@ async function route(req, context) {
                 json: {
                     name: error.name,
                     message: error.message,
-                    stack: error.stack
+                    stackTrace: error.stack
                 }
             }
         }
