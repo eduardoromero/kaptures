@@ -64,7 +64,10 @@ async function getCategories(req) {
 
         return mapper(json);
     } catch (e) {
-        logger.error(e, "There was an error");
+        logger.error({
+            ...error,
+            stackTrace: error.stackTrace,
+        }, "Unexpected Error");
 
         return {
             status: 502,

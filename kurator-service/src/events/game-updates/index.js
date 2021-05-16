@@ -43,16 +43,17 @@ async function createCategory(categoryName) {
             created: (new Date()).toJSON()
         };
 
-        logger.info({category}, `Category: ${categoryName}`);
+        logger.info({categoryId: categoryName, category}, `Category: ${categoryName}`);
         // going via the low-level DynamoDB DocumentClient because of composite key
         const params = {Key: key, Item: category, TableName: data._name("categories")};
-        logger.debug({params}, "Update Category Query");
+        logger.debug({categoryId: categoryName, params}, "Update Category Query");
         await data._doc.put(params).promise();
 
-        logger.info({category}, `Created ${categoryName} category successfully`);
+        logger.info({categoryId: categoryName, category}, `Created ${categoryName} category successfully`);
         return category;
     } catch (error) {
         logger.error({
+            categoryId: categoryName,
             error,
             stack: error.stack
         }, `There was an error when attempting to create category: ${categoryName}`);
@@ -65,7 +66,7 @@ async function createCategoryGame(categoryName, game) {
     subsegment.addAnnotation('gameId', game.id);
     subsegment.addAnnotation('category', categoryName);
 
-    logger.info({category: categoryName}, `Creating category ${categoryName}`);
+    logger.info({gameId: game.id, categoryId: categoryName}, `Creating category ${categoryName}`);
 
     const categoryGameKey = buildCategoryGameKey(categoryName, game.id);
     const entry = {
@@ -81,7 +82,7 @@ async function createCategoryGame(categoryName, game) {
 
     // going via the low-level DynamoDB DocumentClient because of composite key
     const params = {Key: categoryGameKey, Item: entry, TableName: data._name("categories")};
-    logger.debug({params}, "Update CategoryGame Query");
+    logger.debug({gameId: game.id, params, categoryId: categoryName}, "Update CategoryGame Query");
 
     return data._doc.put(params).promise();
 }
@@ -107,7 +108,9 @@ async function updateCategory(categoryName, game) {
 
         logger.error({
             gameId: game.id,
-            category: categoryName, ...error
+            categoryId: categoryName,
+            ...error,
+            stackTrace: error.stackTrace,
         }, `Error when updating category ${categoryName}`);
     } finally {
         subsegment.close();

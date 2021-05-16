@@ -40,10 +40,11 @@ function mapper(data) {
 }
 
 async function getGame(request) {
-    console.log({request})
     const {game: gameId} = request.params || {};
 
     if (!gameId) {
+        logger.error({gameId}, "Bad Request");
+
         return {
             status: 400,
             message: "Bad Request",
@@ -54,6 +55,8 @@ async function getGame(request) {
         const data = await getDDBGame(gameId);
 
         if (!data || !data.id) {
+            logger.error({gameId}, "Game Not Found");
+
             return {
                 status: 404,
                 message: "Not found",
@@ -65,11 +68,19 @@ async function getGame(request) {
             ...mapper(data),
         }
 
+        logger.debug({game: json, gameId}, `Successfully returned ${gameId}`);
+
         return {
             status: 200,
             json
         };
     } catch (error) {
+        logger.error({
+            gameId,
+            ...error,
+            stackTrace: error.stackTrace,
+        }, "Unexpected Error");
+
         return {
             status: 502,
             json: {
