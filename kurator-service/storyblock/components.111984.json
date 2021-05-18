@@ -1,0 +1,168 @@
+{
+  "components": [
+    {
+      "name": "games",
+      "display_name": null,
+      "created_at": "2021-04-19T07:24:30.403Z",
+      "updated_at": "2021-04-19T08:10:04.114Z",
+      "id": 1484349,
+      "schema": {
+        "id": {
+          "type": "text"
+        },
+        "name": {
+          "type": "text"
+        },
+        "website": {
+          "type": "multilink"
+        },
+        "categories": {
+          "type": "options",
+          "keys": [
+            "category"
+          ],
+          "options": [
+            {
+              "value": "action",
+              "name": "Action"
+            },
+            {
+              "value": "adventure",
+              "name": "Adventure"
+            },
+            {
+              "value": "arcade",
+              "name": "Arcade"
+            },
+            {
+              "value": "casual",
+              "name": "Casual"
+            },
+            {
+              "value": "fighting",
+              "name": "Fighting"
+            },
+            {
+              "value": "indi",
+              "name": "Indi"
+            },
+            {
+              "value": "puzzle",
+              "name": "Puzzle"
+            }
+          ]
+        },
+        "developer": {
+          "type": "text"
+        },
+        "publisher": {
+          "type": "text"
+        },
+        "platforms": {
+          "type": "options",
+          "options": [
+            {
+              "value": "amazon-luna",
+              "name": "Amazon Luna"
+            },
+            {
+              "value": "nintendo-switch",
+              "name": "Nintendo Switch"
+            },
+            {
+              "value": "pc",
+              "name": "PC"
+            },
+            {
+              "value": "mac",
+              "name": "Mac"
+            },
+            {
+              "value": "ps",
+              "name": "PlayStation"
+            },
+            {
+              "value": "xbox",
+              "name": "Xbox"
+            }
+          ],
+          "min_options": "1",
+          "display_name": ""
+        }
+      },
+      "image": null,
+      "preview_field": null,
+      "is_root": true,
+      "preview_tmpl": null,
+      "is_nestable": false,
+      "all_presets": [],
+      "preset_id": null,
+      "real_name": "games",
+      "component_group_uuid": null
+    },
+    {
+      "name": "kaptures",
+      "display_name": null,
+      "created_at": "2021-05-17T07:30:26.609Z",
+      "updated_at": "2021-05-17T07:40:30.293Z",
+      "id": 1541117,
+      "schema": {
+        "id": {
+          "type": "text",
+          "pos": 0
+        },
+        "game": {
+          "type": "multilink",
+          "required": true,
+          "pos": 1,
+          "restrict_content_types": true,
+          "component_whitelist": [
+            "games"
+          ],
+          "link_scope": "games/",
+          "force_link_scope": false
+        },
+        "kapture": {
+          "type": "text",
+          "required": true,
+          "regex": "(\\b(https?)://)?[-A-Za-z0-9+&@#/%?=~_|!:,.;]+[-A-Za-z0-9+&@#/%=~_|]",
+          "description": "URL of the kapture",
+          "display_name": "",
+          "pos": 2
+        },
+        "title": {
+          "type": "text",
+          "pos": 3
+        },
+        "comment": {
+          "type": "textarea",
+          "pos": 4,
+          "max_length": "240",
+          "display_name": "What's the koolest part about this kapture?"
+        },
+        "owner": {
+          "type": "text",
+          "pos": 5,
+          "required": true
+        },
+        "views": {
+          "type": "number",
+          "pos": 6
+        },
+        "likes": {
+          "type": "number",
+          "pos": 7
+        }
+      },
+      "image": null,
+      "preview_field": null,
+      "is_root": true,
+      "preview_tmpl": null,
+      "is_nestable": false,
+      "all_presets": [],
+      "preset_id": null,
+      "real_name": "kaptures",
+      "component_group_uuid": null
+    }
+  ]
+}
