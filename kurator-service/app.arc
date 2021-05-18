@@ -8,7 +8,7 @@ get /api/games/:game
 get /api/categories
 get /api/categories/:category
 
-post /webhooks/games
+post /webhooks/storyblok
 
 @events
 game-updates
