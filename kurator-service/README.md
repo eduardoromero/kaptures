@@ -7,6 +7,14 @@ web page, game developer, etc.
 They also write about games, achievements, and select the best Kaptures for the game's 
 detail page on Kapture's Kaffe (our main website).
 
+##### Table of Contents
+- [Components Diagrams](#components-diagrams)
+  - [Write API](#write-api) 
+  - [Read API](#read-api)
+- [Running the code](#running-the-code)
+- [Local Development](#developer-workflow)
+- [Using Postman](#using-postman)
+
 ## How it works?
 
 Just a centralized database that owns the definitions of the games. Kurators use our CMS
@@ -227,3 +235,17 @@ After your changes work locally, re-deploy to update your Serverless App.
 ```shell
 $ arc deploy
 ```
+
+### Using Postman
+
+Get [Postman](https://www.postman.com/downloads/), then load the collection [here](./postman/kaptures.postman_collection.json):
+
+![Postman](./postman/000-img-postman.jpg)
+
+### Prettier logs
+Run `npm i -g pino-pretty`. Then when starting the local sandbox use:
+
+```shell
+$ arc sandbox|pino-pretty
+```
+

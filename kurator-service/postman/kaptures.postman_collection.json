@@ -1,0 +1,123 @@
+{
+	"info": {
+		"_postman_id": "3a32deeb-5f21-4351-bd24-818614331410",
+		"name": "Kap",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "/api/categories",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/api/categories",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"api",
+						"categories"
+					]
+				},
+				"description": "Get Game Definitions"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/categories/{id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/api/categories/indi",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"api",
+						"categories",
+						"indi"
+					]
+				},
+				"description": "Get Game Definitions"
+			},
+			"response": []
+		},
+		{
+			"name": "/api/games",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/api/games",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"api",
+						"games"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/api/games/{id}",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:3333/api/games/hollow-knight",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"api",
+						"games",
+						"hollow-knight"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "/webhooks/storyblok",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"text\": \"The user published the Story Hollow Knight (games/hollow-knight)\\nhttps://app.storyblok.com/#!/me/spaces/111984/stories/0/0/46043571\",\n    \"action\": \"published\",\n    \"space_id\": 111984,\n    \"story_id\": 46043571\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3333/webhooks/storyblok",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3333",
+					"path": [
+						"webhooks",
+						"storyblok"
+					]
+				},
+				"description": "Post Webhook Update"
+			},
+			"response": []
+		}
+	]
+}
