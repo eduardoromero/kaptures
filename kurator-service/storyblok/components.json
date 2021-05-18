@@ -2,7 +2,7 @@
   "components": [
     {
       "name": "games",
-      "display_name": null,
+      "display_name": "Games",
       "created_at": "2021-04-19T07:24:30.403Z",
       "updated_at": "2021-04-19T08:10:04.114Z",
       "id": 1484349,
@@ -102,7 +102,7 @@
     },
     {
       "name": "kaptures",
-      "display_name": null,
+      "display_name": "Kaptures",
       "created_at": "2021-05-17T07:30:26.609Z",
       "updated_at": "2021-05-17T07:40:30.293Z",
       "id": 1541117,

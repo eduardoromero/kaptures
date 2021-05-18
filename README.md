@@ -20,4 +20,8 @@ and who you share it with.
 Our IA (dubbed Sekret Recipe) selects the best shots based on all your info, and the historical
 data we have for that game from other players, and makes suggestions so you share the Crème de la crème, 
 and Wow your friends and community.
-   
+
+## Context Diagram
+
+![Context Diagram](./docs/context-diagram.jpg)
+

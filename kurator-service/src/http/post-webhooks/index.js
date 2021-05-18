@@ -21,7 +21,7 @@ async function getStoryblockContent(id) {
     logger.info({storyId: id}, `Fetching data for storyId: ${id}`);
 
     return storyblock.getStory(id).then(response => {
-        subsegment.addMetadata('storyblock-content', response);
+        subsegment.addMetadata('storyblok-content', response);
         return response.data;
     }).catch(error => {
         subsegment.addError(error);
